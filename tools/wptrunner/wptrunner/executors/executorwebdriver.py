@@ -379,12 +379,14 @@ class WebDriverBidiScriptProtocolPart(BidiScriptProtocolPart):
     def setup(self):
         self.webdriver = self.parent.webdriver
 
-    async def call_function(self, function_declaration, target, arguments=None):
+    async def call_function(self, function_declaration, target, arguments=None,
+                            user_activation=False):
         return await self.webdriver.bidi_session.script.call_function(
             function_declaration=function_declaration,
             arguments=arguments,
             target=target,
-            await_promise=True)
+            await_promise=True,
+            user_activation=user_activation)
 
 
 class WebDriverBidiEmulationProtocolPart(BidiEmulationProtocolPart):

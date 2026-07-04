@@ -244,6 +244,13 @@
     };
     window.test_driver_internal.in_automation = true;
 
+    window.test_driver_internal.bidi.grant_user_activation = function(context) {
+        return create_action("bidi.grant_user_activation", {
+            // Default to the current window.
+            context: context ?? window
+        });
+    };
+
     window.test_driver_internal.bidi.bluetooth.handle_request_device_prompt =
         function(params) {
         return create_action('bidi.bluetooth.handle_request_device_prompt', {

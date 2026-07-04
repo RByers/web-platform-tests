@@ -23,6 +23,21 @@ def get_browsing_context_id(context):
         return context.browsing_context
     raise ValueError("Unexpected context type: %s" % context)
 
+class BidiGrantUserActivationAction:
+    name = "bidi.grant_user_activation"
+
+    def __init__(self, logger, protocol):
+        do_delayed_imports()
+        self.logger = logger
+        self.protocol = protocol
+
+    async def __call__(self, payload):
+        context = get_browsing_context_id(payload["context"])
+        self.logger.debug("Granting user activation to context %s" % context)
+        return await self.protocol.bidi_script.call_function(
+            "() => {}", target={"context": context}, user_activation=True)
+
+
 class BidiBluetoothAction:
     def __init__(self, logger, protocol):
         do_delayed_imports()
@@ -359,6 +374,7 @@ class BidiDigitalCredentialsSetVirtualWalletBehaviorAction:
 
 
 async_actions = [
+    BidiGrantUserActivationAction,
     BidiBluetoothHandleRequestDevicePrompt,
     BidiBluetoothSimulateAdapterAction,
     BidiBluetoothDisableSimulationAction,

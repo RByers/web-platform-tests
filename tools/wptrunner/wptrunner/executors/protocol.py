@@ -693,7 +693,8 @@ class BidiScriptProtocolPart(ProtocolPart):
             self,
             function_declaration: str,
             target: Mapping[str, Any],
-            arguments: Optional[List[Mapping[str, Any]]] = None
+            arguments: Optional[List[Mapping[str, Any]]] = None,
+            user_activation: bool = False
     ) -> Mapping[str, Any]:
         """
         Executes the provided script in the given target in asynchronous mode.
@@ -701,6 +702,8 @@ class BidiScriptProtocolPart(ProtocolPart):
         :param str function_declaration: The js source of the function to execute.
         :param script.Target target: The target in which to execute the script.
         :param list[script.LocalValue] arguments: The arguments to pass to the script.
+        :param bool user_activation: Whether to run the script with transient
+                                     user activation.
         """
         pass
 

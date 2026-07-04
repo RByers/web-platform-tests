@@ -1177,6 +1177,23 @@
          *                    function throws an error
          */
         bless: function(intent, action, context=null) {
+            // When the test has enabled WebDriver BiDi, grant user activation
+            // directly via the protocol (`userActivation` in
+            // https://w3c.github.io/webdriver-bidi/#command-script-callFunction)
+            // rather than synthesizing a click on an injected button. Unlike
+            // real input, the protocol-based grant cannot be blocked by
+            // browser UI such as a modal dialog or sheet, and cannot race
+            // with page rendering or focus.
+            if (features.includes('bidi') &&
+                window.test_driver_internal.in_automation) {
+                return window.test_driver_internal.bidi.grant_user_activation(context)
+                    .then(() => {
+                        if (typeof action === "function") {
+                            return action();
+                        }
+                        return null;
+                    });
+            }
             let contextDocument = context ? context.document : document;
             var button = contextDocument.createElement("button");
             button.innerHTML = "This test requires user interaction.<br />" +
@@ -2430,6 +2447,10 @@
         in_automation: false,
 
         bidi: {
+            grant_user_activation: function(context=null) {
+                throw new Error(
+                    'bidi.grant_user_activation is not implemented by testdriver-vendor.js');
+            },
             bluetooth: {
                 handle_request_device_prompt: function() {
                     throw new Error(
