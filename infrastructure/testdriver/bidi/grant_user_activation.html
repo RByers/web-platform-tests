@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>TestDriver bidi.grant_user_activation method</title>
+<script src="/resources/testharness.js"></script>
+<script src="/resources/testharnessreport.js"></script>
+<script src="/resources/testdriver.js?feature=bidi"></script>
+<script src="/resources/testdriver-vendor.js"></script>
+<body>
+<script>
+promise_test(async () => {
+  assert_false(navigator.userActivation.isActive,
+    "should have no activation before the grant");
+  await test_driver.bidi.grant_user_activation();
+  assert_true(navigator.userActivation.isActive,
+    "should be active after the grant");
+  assert_true(navigator.userActivation.hasBeenActive,
+    "should have sticky activation after the grant");
+}, 'grants user activation to the current window by default');
+
+promise_test(async (t) => {
+  const iframe = document.createElement('iframe');
+  document.body.appendChild(iframe);
+  t.add_cleanup(() => iframe.remove());
+  const iframeWindow = iframe.contentWindow;
+  assert_false(iframeWindow.navigator.userActivation.isActive,
+    "iframe should have no activation before the grant");
+  await test_driver.bidi.grant_user_activation(iframeWindow);
+  assert_true(iframeWindow.navigator.userActivation.isActive,
+    "iframe should be active after the grant");
+}, 'grants user activation to an iframe passed as context');
+</script>
+</body>

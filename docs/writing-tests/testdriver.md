@@ -285,6 +285,17 @@ derived from that element, and must match any explicitly set
 context. Using elements in multiple contexts in a single action chain
 is not supported.
 
+### User Activation ###
+
+Grants [transient user activation](https://html.spec.whatwg.org/multipage/interaction.html#tracking-user-activation)
+to a browsing context directly through the protocol, without generating input
+events, using the [`userActivation`](https://w3c.github.io/webdriver-bidi/#command-script-callFunction)
+parameter of the WebDriver BiDi `script.callFunction` command.
+
+```eval_rst
+.. js:autofunction:: test_driver.bidi.grant_user_activation
+```
+
 ### Log
 
 This module corresponds to the WebDriver BiDi

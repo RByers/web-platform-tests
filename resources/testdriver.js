@@ -87,6 +87,37 @@
              * object.
              */
             /**
+             * Grants transient user activation to a browsing context.
+             *
+             * Unlike :js:func:`test_driver.bless`, the activation is granted
+             * directly through the protocol without generating any input
+             * events, so it works even when real input cannot be delivered to
+             * the page (e.g. while browser-modal UI such as a permission
+             * prompt or payment sheet is showing) and cannot race with
+             * rendering or focus. Note that it also does not have the side
+             * effects of real interaction (no events are fired, and focus
+             * does not change).
+             *
+             * Matches the `userActivation` parameter of the
+             * `script.callFunction
+             * <https://w3c.github.io/webdriver-bidi/#command-script-callFunction>`_
+             * WebDriver BiDi command.
+             *
+             * @example
+             * await test_driver.bidi.grant_user_activation();
+             * document.body.requestFullscreen();
+             *
+             * @param {Context} [context] - Browsing context in which to grant
+             *                  the activation. Defaults to the current
+             *                  browsing context.
+             * @returns {Promise} fulfilled after the activation is granted, or
+             *                    rejected in case the operation fails.
+             */
+            grant_user_activation: function(context=null) {
+                assertBidiIsEnabled();
+                return window.test_driver_internal.bidi.grant_user_activation(context);
+            },
+            /**
              * `bluetooth <https://webbluetoothcg.github.io/web-bluetooth>`_ module.
              */
             bluetooth: {
@@ -1177,23 +1208,6 @@
          *                    function throws an error
          */
         bless: function(intent, action, context=null) {
-            // When the test has enabled WebDriver BiDi, grant user activation
-            // directly via the protocol (`userActivation` in
-            // https://w3c.github.io/webdriver-bidi/#command-script-callFunction)
-            // rather than synthesizing a click on an injected button. Unlike
-            // real input, the protocol-based grant cannot be blocked by
-            // browser UI such as a modal dialog or sheet, and cannot race
-            // with page rendering or focus.
-            if (features.includes('bidi') &&
-                window.test_driver_internal.in_automation) {
-                return window.test_driver_internal.bidi.grant_user_activation(context)
-                    .then(() => {
-                        if (typeof action === "function") {
-                            return action();
-                        }
-                        return null;
-                    });
-            }
             let contextDocument = context ? context.document : document;
             var button = contextDocument.createElement("button");
             button.innerHTML = "This test requires user interaction.<br />" +
